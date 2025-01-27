@@ -1,20 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int health = 3; // プレイヤーhp
+    public int maxHealth;
+    private int currentHealth;
+    public Image[] healthIcons; // hpのImage配列
+    public string gameoverSceneName = "GameOver";
+
+    void Start()
+    {
+        currentHealth = maxHealth;
+        UpdateHealthUI();
+    }
 
     public void TakeDamage(int damage)
     {
-        health -= damage; // ダメージを受けた時、hp減少
-        Debug.Log("Player Health: " + health);
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); // HPが0未満にならないように
+        UpdateHealthUI();
+        Debug.Log("Player HP: " + currentHealth);
 
-        if (health <= 0)
+        if (currentHealth <= 0)
         {
-            Debug.Log("Player is dead!");
-            // プレイヤーの死亡処理
+            Die();
         }
+    }
+
+    private void UpdateHealthUI()
+    {
+        // 各アイコンの有効/無効を設定
+        for (int i = 0; i < healthIcons.Length; i++)
+        {
+            healthIcons[i].enabled = i < currentHealth; // 現在のHP以下のアイコンを非表示
+        }
+    }
+
+    void Die()
+    {
+        SceneManager.LoadScene(gameoverSceneName);
+        Destroy(gameObject);
     }
 }

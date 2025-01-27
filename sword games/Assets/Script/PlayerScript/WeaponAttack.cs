@@ -8,9 +8,13 @@ public class WeaponAttack : MonoBehaviour
     {
         if (collision.CompareTag("Enemy"))
         {
-            Destroy(collision.gameObject);
-            Debug.Log("Enemy Destroyed!");
-            
+            // 敵のアニメーションを再生
+            Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(); // 敵が倒されるアニメーションを再生
+            }
+
             // スコアを加算
             ScoreManager.instance.AddScore(1);
         }

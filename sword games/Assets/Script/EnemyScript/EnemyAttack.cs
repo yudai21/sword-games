@@ -1,23 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour
 {
     public int damage = 1; // プレイヤーへのダメージ
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    // プレイヤーに到達した際の処理
+    public void OnReachPlayer()
     {
-        if (collision.CompareTag("Player"))
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
         {
-            // プレイヤーのhpを減少させる
-            PlayerHealth playerHealth = collision.GetComponent<PlayerHealth>();
+            PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(damage); // ダメージを与える
             }
-
-            Destroy(gameObject); // 自分を消す
         }
+
+        Destroy(gameObject); // 自分を消す
     }
 }

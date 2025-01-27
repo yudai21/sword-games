@@ -1,33 +1,53 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-    public float speed = 2f; // 敵の移動速度
-    private Vector2 direction;
+    public float speed;  // 移動速度（Spawner から設定）
+    public bool isLeftSpawn;  // 左からスポーンしたか
+    private Vector2 targetPosition;  // プレイヤーの位置
+    private Animator animator;  // Animator
+    private EnemyAttack enemyAttack; // EnemyAttack への参照
 
-    // Start is called before the first frame update
     void Start()
     {
-        // 敵が左右どちらから来るか決定（ランダム）
-        direction = transform.position.x > 0 ? Vector2.left : Vector2.right;  
+        // プレイヤーの位置をターゲットとして設定
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            targetPosition = player.transform.position;
+        }
+
+        animator = GetComponent<Animator>();
+
+        // EnemyAttack コンポーネントを取得
+        enemyAttack = GetComponent<EnemyAttack>();
+
+        // スポーン方向に応じてアニメーションを設定
+        if (animator != null)
+        {
+            if (isLeftSpawn)
+            {
+                animator.SetTrigger("MoveRight");  // 右向きアニメーション
+            }
+            else
+            {
+                animator.SetTrigger("MoveLeft");  // 左向きアニメーション
+            }
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // 敵をプレイヤーに向かって移動させる
-        transform.Translate(direction * speed * Time.deltaTime);
-    }
+        // プレイヤーに向かって移動
+        transform.position = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
 
-    // void OnTriggerEnter2D(Collider2D collision)
-    // {
-    //     if (collision.CompareTag("Player"))
-    //     {
-    //         // ゲームオーバー処理
-    //         Debug.Log("ゲームオーバー");
-    //         Time.timeScale = 0; // ゲームを停止
-    //     }
-    // }
+        // 到達時の処理を EnemyAttack に委譲
+        if (Vector2.Distance(transform.position, targetPosition) < 0.1f)
+        {
+            if (enemyAttack != null)
+            {
+                enemyAttack.OnReachPlayer(); // 到達時の処理を呼び出す
+            }
+        }
+    }
 }
